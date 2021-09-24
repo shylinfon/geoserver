@@ -18,6 +18,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.LayerInfo;
+import org.geoserver.catalog.Predicates;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.util.CloseableIterator;
 import org.geoserver.catalog.util.CloseableIteratorAdapter;
@@ -39,6 +40,12 @@ public abstract class LayerListPanel extends GeoServerTablePanel<LayerInfo> {
 
         private static final long serialVersionUID = -4793382279386643262L;
 
+        private WorkspaceInfo wsInfo;
+
+        public LayerListProvider(WorkspaceInfo workspace) {
+            this.wsInfo = workspace;
+        }
+
         @Override
         protected List<Property<LayerInfo>> getProperties() {
             return Arrays.asList(NAME, STORE, WORKSPACE);
@@ -57,7 +64,7 @@ public abstract class LayerListPanel extends GeoServerTablePanel<LayerInfo> {
     public LayerListPanel(String id, final WorkspaceInfo workspace) {
         this(
                 id,
-                new LayerListProvider() {
+                new LayerListProvider(workspace) {
 
                     private static final long serialVersionUID = 426375054014475107L;
 
@@ -94,6 +101,21 @@ public abstract class LayerListPanel extends GeoServerTablePanel<LayerInfo> {
                                                     true));
                         }
                         return filter;
+                    }
+
+                    @Override
+                    public int fullSize() {
+                        Filter filter = Predicates.acceptAll();
+                        if (workspace != null) {
+                            FilterFactory ff = CommonFactoryFinder.getFilterFactory2();
+                            filter =
+                                    ff.equal(
+                                            ff.property("resource.store.workspace.id"),
+                                            ff.literal(workspace.getId()),
+                                            true);
+                        }
+                        int count = getCatalog().count(LayerInfo.class, filter);
+                        return count;
                     }
 
                     /**
