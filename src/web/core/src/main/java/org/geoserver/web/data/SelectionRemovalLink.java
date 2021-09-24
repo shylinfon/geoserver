@@ -74,6 +74,8 @@ public class SelectionRemovalLink extends AjaxLink<Void> {
                         // the deletion will have changed what we see in the page
                         // so better clear out the selection
                         catalogObjects.clearSelection();
+
+                        catalogObjects.updatePager(target);
                         return true;
                     }
 

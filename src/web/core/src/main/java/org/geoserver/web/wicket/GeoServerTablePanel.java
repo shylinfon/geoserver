@@ -604,6 +604,15 @@ public abstract class GeoServerTablePanel<T> extends Panel {
         target.add(filterForm);
     }
 
+    /** update labels of the pager  */
+    public void updatePager(AjaxRequestTarget target) {
+        pagerDelegate.updateMatched();
+        navigatorTop.updateMatched();
+        navigatorBottom.updateMatched();
+        target.add(navigatorTop);
+        target.add(navigatorBottom);
+    }
+
     /** Sets back to the first page, clears the selection and */
     public void reset() {
         dataView.setCurrentPage(0);
